@@ -5,7 +5,7 @@
 
 class UserService {
     public:
-        void getAllUsers(void);
+        void verifyUserAccess(char *rfidCode);
 
 };
 

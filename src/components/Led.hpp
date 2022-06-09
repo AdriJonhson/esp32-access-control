@@ -8,6 +8,8 @@ class Led {
         Led(const int pin);
 
         void blink(void);
+        void on(void);
+        void off(void);
 
     private:
         int _pin;

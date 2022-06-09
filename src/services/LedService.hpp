@@ -6,6 +6,10 @@
 class LedService {
     public:
         void blinkDefault(void);
+        void blinkGreen(void);
+        void blinkRed(void);
+        void onLedYellow(void);
+        void offLedYellow(void);
 
 };
 

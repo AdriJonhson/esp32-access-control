@@ -8,8 +8,14 @@ Led::Led(const int pin) {
 
 void Led::blink(void) {
     digitalWrite(_pin, HIGH);
-    delay(500);
-
+    delay(1000);
     digitalWrite(_pin, LOW);
-    delay(500);
+}
+
+void Led::on(void) {
+    digitalWrite(_pin, HIGH);
+}
+
+void Led::off(void) {
+    digitalWrite(_pin, LOW);
 }
