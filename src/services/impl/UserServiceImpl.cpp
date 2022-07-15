@@ -27,7 +27,8 @@ String requestGetUser(char *rfidCode)
 {
   HTTPClient client;
 
-  client.begin(HOST + "/api/users/verify-access?rfidCode=" + String(rfidCode));
+  client.begin(HOST + "/api/users/verify-access?rfidCode=" + rfidCode);
+
   int httpCode = client.GET();
 
   String payload;

@@ -1,13 +1,13 @@
 #include "../LedService.hpp"
 
 #include "../../components/Led.hpp"
-#include "../../configs/PinConfigs.cpp"
+#include "../../configs/PinConfig.cpp"
 
-Led defaultLed(PinConfigs::getDefaultLed());
+Led defaultLed(PinConfigs::defaultLed);
 
-Led yellowLed(14);
-Led redLed(13);
-Led greenLed(12);
+Led yellowLed(2);
+Led redLed(2);
+Led greenLed(2);
 
 
 void LedService::blinkDefault(void) {
