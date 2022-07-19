@@ -13,13 +13,14 @@
 #define TOPIC_PUBLISH "valid_access"
 #define TOPIC_CONSUMER "valid_access"
 
-#define PASSWORD "88226842"
-#define SSID "Tix Maria"
-
 const char* MQTT_HOST = "162.243.165.170"; 
 const char* MQTT_USER = "esp32";
 const char* MQTT_PASSWORD= "esp32";
 const int MQTT_PORT = 1883;
+
+// WiFi CREDENTIALS
+const char *ssid = "MOB-MARIA";
+const char *password = "88226842ma";
 
 // Internal Services
 UserService userService;
@@ -41,34 +42,32 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.println("-----------------------");
 }
 
-void wifiConnect() {
+
+void initWifi() {
   if (WiFi.status() == WL_CONNECTED) {
     digitalWrite(2, HIGH);
-
+    
     return;
   }
 
   digitalWrite(2, LOW);
 
-  Serial.print("Connecting: ");
-  Serial.print(SSID);
-  Serial.println("  Waiting!\n");
-
-  WiFi.begin(SSID, PASSWORD);
- 
+  WiFi.begin(ssid, password);
+  Serial.println("");
+  Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
+    delay(500);
     Serial.print(".");
   }
-  
-  Serial.println();
-  Serial.print("Wifi Connected: ");
-  Serial.print(SSID);  
-  Serial.print("  IP: ");
+
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 }
 
-void connectMQTT() {
+void initMQTT() {
   while (!MQTT.connected()) {
       Serial.print("Conectando ao Broker MQTT: ");
       Serial.println(MQTT_HOST);
@@ -87,24 +86,22 @@ void connectMQTT() {
 }
 
 void verifyConnect() {
-
   if (!MQTT.connected()) {
-    connectMQTT(); 
+    initMQTT(); 
   }
  
-  wifiConnect();
+  initWifi();
 }
 
 void setup() {
-  Serial.begin(9600);
-
-  pinMode(2, OUTPUT);
+  Serial.begin(115200);
 
   SPI.begin();
   rfid.PCD_Init();
+  
   Serial.print("Starting ESP32");
 
-  wifiConnect();
+  initWifi();
 
   MQTT.setServer(MQTT_HOST, MQTT_PORT);
   MQTT.setCallback(callback);
@@ -118,9 +115,7 @@ void setup() {
 }
 
 void loop() {
-  verifyConnect();
-
-  // MQTT.publish(TOPIC_PUBLISH, "0");
+  initWifi();
 
   String cardCode = "";
 
