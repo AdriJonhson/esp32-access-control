@@ -78,9 +78,9 @@ void initMQTT() {
         Serial.println("Conectado ao Broker com sucesso!");
       } 
       else {
-          Serial.println("Noo foi possivel se conectar ao broker.");
-          Serial.println("Nova tentatica de conexao em 10s");
-          delay(10000);
+        Serial.println("Noo foi possivel se conectar ao broker.");
+        Serial.println("Nova tentatica de conexao em 10s");
+        delay(10000);
       }
   }
 }
@@ -142,6 +142,10 @@ void loop() {
     Serial.println("Card Code: " + String(cardCodeFinal) + "\n");
 
     userService.verifyUserAccess(cardCodeFinal);
+
+    Serial.println("-----------------------");
+    Serial.println("Waiting for card");
+    Serial.println("-----------------------");
   }else{
     Serial.println("Connection Lost...");
   }
