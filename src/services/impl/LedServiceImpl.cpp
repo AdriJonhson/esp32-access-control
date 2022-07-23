@@ -5,9 +5,9 @@
 
 Led defaultLed(PinConfigs::defaultLed);
 
-Led yellowLed(2);
-Led redLed(2);
-Led greenLed(2);
+Led yellowLed(13);
+Led redLed(12);
+Led greenLed(14);
 
 
 void LedService::blinkDefault(void) {

@@ -7,7 +7,8 @@
 
 LedService ledService;
 
-const String HOST = "https://esp32-access-control-api.herokuapp.com";
+// const String HOST = "https://esp32-access-control-api.herokuapp.com";
+const String HOST = "http://147.182.191.7:8080";
 
 StaticJsonDocument<200> parseJson(String payload)
 {
