@@ -9,6 +9,7 @@
 #include "./configs/WifiConfig.cpp"
 
 #include "./services/UserService.hpp"
+#include "./services/LedService.hpp"
 
 #define CLIENT_ID  "esp32-main"
 #define EXCHANGE_PUBLISH_CARD "user_card_verify"
@@ -25,12 +26,16 @@ const char *password = "88226842ma";
 
 // Internal Services
 UserService userService;
+LedService ledServiceMain;
 
 // Lib Instances
 MFRC522 rfid(PinConfigs::dataPin, PinConfigs::resetPin);
 WiFiClient wifiClient;
 
 PubSubClient MQTT(wifiClient);
+
+String actionType;
+String registerIdentify;
 
 StaticJsonDocument<200> parseJsonTest(String payload)
 {
@@ -44,6 +49,14 @@ StaticJsonDocument<200> parseJsonTest(String payload)
   deserializeJson(doc, jsonMessage);
 
   return doc;
+}
+
+void requestRfidCode(String registerId)
+{
+  ledServiceMain.onLedYellow();
+
+  actionType = "RCD";
+  registerIdentify = registerId;
 }
 
 void callback(char *topic, byte *payload, unsigned int length) {
@@ -65,6 +78,18 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
   Serial.println();
   Serial.println("-----------------------");
+
+  const char *actionType = doc["actionType"];
+  String actionTypeFinal = String(actionType);
+
+  Serial.println("Action Type: " + actionTypeFinal + "\n");
+
+  if(actionTypeFinal == "RCD") {
+    const char *registerIdentify = doc["registerIdentify"];
+    String registerIdentifyFinal = String(registerIdentify);
+
+    requestRfidCode(registerIdentifyFinal);
+  }
 }
 
 void initWifi() {
@@ -150,7 +175,7 @@ void loop() {
     cardCode.concat(String(rfid.uid.uidByte[i], HEX));
   }
 
-  Serial.println("Verificando usuário...\n");
+  Serial.println("Verificando cartão...\n");
 
   if((WiFi.status() == WL_CONNECTED)) {
     cardCode.toUpperCase();
@@ -158,15 +183,24 @@ void loop() {
     char *cardCodeFinal = new char[cardCode.length() + 1];
     strcpy(cardCodeFinal, cardCode.c_str());
 
-    MQTT.publish(EXCHANGE_PUBLISH_CARD, cardCodeFinal);
-
     Serial.println("Card Code: " + String(cardCodeFinal) + "\n");
 
-    userService.verifyUserAccess(cardCodeFinal);
+    if(actionType == "RCD") {
+      ledServiceMain.offLedYellow();
 
-    Serial.println("-----------------------");
-    Serial.println("Waiting for card");
-    Serial.println("-----------------------");
+      actionType = "";
+      registerIdentify = "";
+
+      Serial.println("-----------------------");
+    }else{
+      Serial.println("Verificando usuário...\n");
+
+      userService.verifyUserAccess(cardCodeFinal);
+
+      Serial.println("-----------------------");
+      Serial.println("Waiting for card");
+      Serial.println("-----------------------");
+    }
   }else{
     Serial.println("Connection Lost...");
   }
