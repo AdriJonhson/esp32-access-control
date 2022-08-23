@@ -37,6 +37,8 @@ PubSubClient MQTT(wifiClient);
 String actionType;
 char* registerIdentify;
 
+long startWaitingCard;
+
 StaticJsonDocument<200> parseJsonTest(String payload)
 {
   char jsonMessage[500];
@@ -54,6 +56,8 @@ StaticJsonDocument<200> parseJsonTest(String payload)
 void requestRfidCode()
 {
   ledServiceMain.onLedYellow();
+
+  startWaitingCard = millis();
 }
 
 void callback(char *topic, byte *payload, unsigned int length) {
@@ -164,6 +168,12 @@ void loop() {
   MQTT.loop();
 
   String cardCode = "";
+
+  if((millis() - startWaitingCard) > 5000 && actionType == "RCD") {
+    ledServiceMain.offLedYellow();
+    startWaitingCard = 0;
+    actionType = "";
+  }
 
   if (! rfid.PICC_IsNewCardPresent())
     return;
