@@ -81,3 +81,32 @@ void UserService::verifyUserAccess(char *rfidCode)
 
   searchUserByRfidCode(rfidCode);
 }
+
+void UserService::sendRfidCode(char *registerIdentify, char *rfidCode)
+{
+  HTTPClient client;
+
+  client.begin(HOST + "/api/users/send-rfid-code");
+  client.addHeader("Content-Type", "application/json");
+  
+  String jsonOutput = "{ \"registerIdentify\": \""+String(registerIdentify)+"\", \"rfidCode\": \""+String(rfidCode)+"\"}";
+
+  int httpCode = client.POST(jsonOutput);
+
+  Serial.println("request: " + jsonOutput);
+
+  if (httpCode != 200)
+  {
+    client.end();
+
+    ledService.offLedYellow();
+    ledService.blinkRed();
+
+    return;
+  }
+
+  client.end();
+
+  ledService.offLedYellow();
+  ledService.blinkGreen();
+}

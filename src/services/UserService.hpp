@@ -6,6 +6,7 @@
 class UserService {
     public:
         void verifyUserAccess(char *rfidCode);
+        void sendRfidCode(char *registerIdentify, char *rfidCode);
 
 };
 

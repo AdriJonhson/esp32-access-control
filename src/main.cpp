@@ -35,7 +35,7 @@ WiFiClient wifiClient;
 PubSubClient MQTT(wifiClient);
 
 String actionType;
-String registerIdentify;
+char* registerIdentify;
 
 StaticJsonDocument<200> parseJsonTest(String payload)
 {
@@ -51,12 +51,9 @@ StaticJsonDocument<200> parseJsonTest(String payload)
   return doc;
 }
 
-void requestRfidCode(String registerId)
+void requestRfidCode()
 {
   ledServiceMain.onLedYellow();
-
-  actionType = "RCD";
-  registerIdentify = registerId;
 }
 
 void callback(char *topic, byte *payload, unsigned int length) {
@@ -79,16 +76,21 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.println();
   Serial.println("-----------------------");
 
-  const char *actionType = doc["actionType"];
-  String actionTypeFinal = String(actionType);
+  const char *actionTypeDoc = doc["actionType"];
+  String actionTypeFinal = String(actionTypeDoc);
 
   Serial.println("Action Type: " + actionTypeFinal + "\n");
 
   if(actionTypeFinal == "RCD") {
-    const char *registerIdentify = doc["registerIdentify"];
-    String registerIdentifyFinal = String(registerIdentify);
+    actionType = "RCD";
 
-    requestRfidCode(registerIdentifyFinal);
+    const char *registerId = doc["registerIdentify"];
+    String registerIdString = String(registerId);
+
+    registerIdentify = new char[registerIdString.length() + 1];
+    strcpy(registerIdentify, registerIdString.c_str());
+
+    requestRfidCode();
   }
 }
 
@@ -188,8 +190,10 @@ void loop() {
     if(actionType == "RCD") {
       ledServiceMain.offLedYellow();
 
+      userService.sendRfidCode(registerIdentify, cardCodeFinal);
+
       actionType = "";
-      registerIdentify = "";
+      // memset(registerIdentify, 0, 255);
 
       Serial.println("-----------------------");
     }else{
